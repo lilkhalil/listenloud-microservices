@@ -1,0 +1,14 @@
+server:
+  port:
+    8080
+spring:
+  application:
+    name: user
+  datasource:
+    url: jdbc:postgresql://localhost:5432/listenloud_users
+    username: postgres
+    password: 1
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update

@@ -1,0 +1,14 @@
+server:
+  port:
+    8081
+spring:
+  application:
+    name: file
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: files
+  http:
+    multipart:
+      max-file-size: 10Mb
