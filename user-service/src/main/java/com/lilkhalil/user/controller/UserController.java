@@ -1,8 +1,9 @@
 package com.lilkhalil.user.controller;
 
+import com.lilkhalil.user.controller.request.RegistrationRequest;
+import com.lilkhalil.user.controller.request.UpdateRequest;
+
 import com.lilkhalil.user.domain.User;
-import com.lilkhalil.user.dto.RegistrationRequest;
-import com.lilkhalil.user.dto.UpdateRequest;
 import com.lilkhalil.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,11 @@ public class UserController {
     public User createUser(@RequestBody RegistrationRequest request)
     {
         return userService.createUser(request);
+    }
+
+    @PostMapping("/find")
+    public User findUserByUsername(@RequestParam("username") String username) {
+        return userService.readUserByUsername(username);
     }
 
     @GetMapping("/{id}")

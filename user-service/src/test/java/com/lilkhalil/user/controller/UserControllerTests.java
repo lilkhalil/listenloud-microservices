@@ -1,9 +1,8 @@
-package com.lilkhalil.user;
+package com.lilkhalil.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lilkhalil.user.controller.UserController;
+import com.lilkhalil.user.controller.request.RegistrationRequest;
 import com.lilkhalil.user.domain.User;
-import com.lilkhalil.user.dto.RegistrationRequest;
 import com.lilkhalil.user.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -53,7 +53,7 @@ public class UserControllerTests {
     @Test
     void whenCreateUserSuccessThenExpectStatusCreated() throws Exception {
         var request = new RegistrationRequest("example", "123");
-        given(userService.createUser(request)).willReturn(User.builder().username("example").password("123").build());
+        given(userService.createUser(any())).willReturn(request.build(new User()));
         mockMvc.perform(
                 post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)

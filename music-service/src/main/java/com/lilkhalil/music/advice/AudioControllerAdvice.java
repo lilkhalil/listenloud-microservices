@@ -1,6 +1,6 @@
-package com.lilkhalil.user.advice;
+package com.lilkhalil.music.advice;
 
-import com.lilkhalil.user.controller.UserController;
+import com.lilkhalil.music.controller.AudioController;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 
-@RestControllerAdvice(basePackageClasses = UserController.class)
+@RestControllerAdvice(basePackageClasses = AudioController.class)
 @Slf4j
-public class UserControllerAdvice {
+public class AudioControllerAdvice {
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<?> handleUserControllerException(RuntimeException e, HttpServletRequest request) {
+    @ExceptionHandler
+    public ResponseEntity<?> handleAudioControllerException(RuntimeException e, HttpServletRequest request) {
         log.error(e.getMessage());
         return new ResponseEntity<>(AbstractExceptionResponse.builder()
                 .message(e.getMessage())

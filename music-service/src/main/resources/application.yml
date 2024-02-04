@@ -1,11 +1,11 @@
 server:
   port:
-    8080
+    8082
 spring:
   application:
-    name: user
+    name: music
   datasource:
-    url: jdbc:postgresql://localhost:5432/listenloud_users
+    url: jdbc:postgresql://localhost:5432/listenloud_music
     username: postgres
     password: 1
     driver-class-name: org.postgresql.Driver

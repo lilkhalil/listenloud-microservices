@@ -1,12 +1,11 @@
 package com.lilkhalil.user.service;
 
+import com.lilkhalil.user.controller.request.RegistrationRequest;
+import com.lilkhalil.user.controller.request.UpdateRequest;
 import com.lilkhalil.user.dao.UserRepository;
 import com.lilkhalil.user.domain.User;
-import com.lilkhalil.user.dto.RegistrationRequest;
-import com.lilkhalil.user.dto.UpdateRequest;
 import com.lilkhalil.user.exception.UserAlreadyExistsException;
 import com.lilkhalil.user.exception.UserNotFoundException;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -22,7 +21,7 @@ import java.util.List;
 @Service
 public class UserService {
 
-    private final static String URL = "http://localhost:8081/api/files";
+    private final static String URL = "http://localhost:8081/api/files/";
 
     @Autowired
     private UserRepository userRepository;
@@ -32,17 +31,11 @@ public class UserService {
 
     public User createUser(RegistrationRequest request) {
 
-        if (userRepository.findByUsername(request.getUsername()).isPresent())
-            throw new UserAlreadyExistsException("User with this username already exists!");
+        throwIfUserExists(request.getUsername());
 
-        User user = User.builder()
-                .username(request.getUsername())
-                .password(request.getPassword())
-                .build();
+        User user = request.build(new User());
 
-        userRepository.saveAndFlush(user);
-
-        return user;
+        return userRepository.saveAndFlush(user);
     }
 
     public List<User> readAllUsers() {
@@ -50,46 +43,34 @@ public class UserService {
     }
 
     public User readUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User with this id not found!"));
+        return getUserIfExists(id);
     }
 
     public User readUserByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User with this username not found!"));
+        return getUserIfExists(username);
     }
 
     public User updateUser(Long id, UpdateRequest request) {
 
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User with this id not found!"));
+        User user = request.build(getUserIfExists(id));
 
-        user.setBiography(request.getBiography());
-        user.setUsername(request.getUsername());
-        user.setPassword(request.getPassword());
-
-        userRepository.save(user);
-
-        return user;
+        return userRepository.save(user);
     }
 
-    @SneakyThrows
     public User uploadProfileImage(Long id, MultipartFile file) {
 
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User does not found!"));
+        User user = getUserIfExists(id);
 
         String response = restTemplate.postForObject(URL, prepareRequest(file), String.class);
 
         user.setImageId(response);
 
-        userRepository.save(user);
-
-        return user;
+        return userRepository.save(user);
     }
 
     public void deleteUserById(Long id) {
 
-        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User with this id not found!"));
+        User user = getUserIfExists(id);
 
         restTemplate.delete(URL + user.getImageId());
 
@@ -102,6 +83,21 @@ public class UserService {
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("file", file.getResource());
         return new HttpEntity<>(body, headers);
+    }
+
+    private User getUserIfExists(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User with username=%s not found!".formatted(username)));
+    }
+
+    private User getUserIfExists(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User with id=%d not found!".formatted(id)));
+    }
+
+    private void throwIfUserExists(String username) {
+        if (userRepository.findByUsername(username).isPresent())
+            throw new UserAlreadyExistsException("User with username=%s already exists!".formatted(username));
     }
 
 }
